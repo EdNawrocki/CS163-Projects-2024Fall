@@ -43,7 +43,7 @@ The operational workflow of FR systems can be divided into five critical stages:
 
 AFR tools strategically target one or more of the five stages in the FR pipeline to prevent accurate identification of individuals, such as Fawkes acting on the fourth stage and Unlearnable Examples on the third.
 
-## [Fawkes](https://arxiv.org/abs/2002.08327 "Original Fawkes Paper")
+# [Fawkes](https://arxiv.org/abs/2002.08327 "Original Fawkes Paper")
 
 ### Motivation
 
@@ -288,7 +288,7 @@ An alternative approach to the identity masking that Fawkes proposes is preventi
 
 1. Proposal networks (P-Nets): performs preliminary facial detection by proposing bounding boxes that contain potential face candidates
 2. Refine networks (R-Nets): improves detection by eliminating false positive proposals and refining the locations and dimensions of the remaining boxes
-3. Output network: detects facial landmark locations and outputs the final bounding box(es)
+3. Output network (O-Nets): detects facial landmark locations and outputs the final bounding box(es)
 
 Their method of choice attacks the first stage of this process, as it presents an opportunity to minimize the most computation costs. By placing grayscale-patterned patches (a common physical domain attack method) onto the cheek areas of face images and using various transformation techniques to ensure robustness, their model has displayed success in preventing the recognition of faces.
 
@@ -391,7 +391,7 @@ In contrast, sample-wise noise applies unique perturbations to each individual s
 
 ## Experiment
 ### Settings and Methodology
-The authors conducted a case study to demonstrate the application of error-minimizing noise on personal face images, addressing scenario where individuals seek to prevent their facial data from being exploited by FR or verification systems. This involves the defender applying error-minimizing noise to their own face images before sharing them on online social media platforms. These altered, or unlearnable, images are subsequently collected by FR systems to train DNNs. The primary objective is to ensure that DNNs trained on these unlearnable images perform poorly when attempting to recognize the defender’s clean face images captured elsewhere, thereby safeguarding the individual’s privacy.
+Huang et al. conducted a case study to demonstrate the application of error-minimizing noise on personal face images, addressing scenario where individuals seek to prevent their facial data from being exploited by FR or verification systems. This involves the defender applying error-minimizing noise to their own face images before sharing them on online social media platforms. These altered, or unlearnable, images are subsequently collected by FR systems to train DNNs. The primary objective is to ensure that DNNs trained on these unlearnable images perform poorly when attempting to recognize the defender’s clean face images captured elsewhere, thereby safeguarding the individual’s privacy.
 
 The experiments are conducted under two distinct settings: partially unlearnable and fully unlearnable. In the partially unlearnable setting, a small subset of identities within the training dataset is made unlearnable. Specifically, 50 identities from the WebFace dataset are selected and augmented with error-minimizing noise using a smaller CelebA-100 subset. 
 
