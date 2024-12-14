@@ -6,13 +6,7 @@ author: Edward Nawrocki, Donovan Rimer, Tyler Cho
 date: 2024-12-13
 ---
 
-
-<<<<<<< HEAD
-> ayaya
-=======
-> In this article, we will examine various anti-facial recognition techniques and discuss their effectiveness. First, we will introduce facial recognition 
-
->>>>>>> fc4ddd7a9b189ca3f2f76b7c30cc9a131a7dab61
+> In this article, we will examine various anti-facial recognition techniques and discuss their effectiveness. First, we will introduce facial recognition...
 
 <!--more-->
 {: class="table-of-content"}
