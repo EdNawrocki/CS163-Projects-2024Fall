@@ -320,21 +320,18 @@ DeepFace was unable to find a match under the threshold.
 These results show that while Fawkes is still effective against some models four years after the original paper was published, advances in the VGG-Face model have surpassed this cloaking technique, at least when put up against a smaller dataset like PubFig.
 
 ## Unlearnable Examples
-
 ### Introduction
-Unlearnable examples is an AFR technique designed to render training data ineffective for Deep Neural Networks (DNNs). The primary objective is to ensure that DNNs trained on these modified examples perform no better than random guessing when evaluated on standard test datasets Unlike traditional privacy-preserving methods that obscure or obfuscate information to protect individual privacy, unlearnable examples aim to maintain the visual quality of the data. For instance, an unlearnable selfie should remain visually appealing and suitable for use as a social profile picture, achieved by adding imperceptible noise that does not introduce noticeable defects.
+Unlearnable Examples is an AFR technique designed to render training data ineffective for Deep Neural Networks (DNNs). The primary objective is to ensure that DNNs trained on these modified examples perform no better than random guessing when evaluated on standard test datasets, while maintaining the visual quality of the data. For instance, an unlearnable selfie should remain visually appealing and suitable for use as a social profile picture, achieved by adding imperceptible noise that does not introduce noticeable defects.
 
-DNNs are susceptible to adversarial, or error-maximizing, noise—small disturbances designed to increase a model’s error during testing However, applying this type of noise in a sample-wise manner during training does not effectively prevent DNNs from learning. To address this limitation, error-minimizing noise is introduced, which aims to deceive the model into perceiving that there is no valuable information to learn from the training examples. This results in unlearnable examples that hinder the DNN’s ability to generalize, making its performance comparable to random guessing on standard test data.
-
-Error-minimizing noise can be generated in two forms: sample-wise and class-wise. Class-wise error-minimizing noise proves to be more effective than random noise and remains robust against training techniques like early stopping. On the other hand, sample-wise error-minimizing noise is identified as the only method capable of making training examples truly unlearnable, outperforming both random and error-maximizing noise strategies.
+DNNs are susceptible to adversarial, or error-maximizing, noise—small disturbances designed to increase a model’s error during testing However, applying this type of noise in a sample-wise manner during training does not effectively prevent DNNs from learning. To address this limitation, error-minimizing noise deceives the model into perceiving that there is no valuable information to learn from the training examples. This results in unlearnable examples that hinder the DNN’s ability to generalize, making its performance comparable to random guessing on standard test data.
 
 ### Objectives
 
-Suppose the clean training dataset consists of $$n$$ clean examples, $$\mathbf{x} \in \mathbf{X}$$ inputs, $$y \in \mathbf{Y} = \{1, \dots, K\}$$ labels, and $$K$$ is the total number of classes. 
+Suppose the clean training dataset consists of n clean examples, $$\mathbf{x} \in \mathbf{X}$$ inputs, $$y \in \mathbf{Y} = \{1, \dots, K\}$$ labels, and K total classes. 
 
-We denote its unlearnable version by $$\mathbf{D}_u = \{(\mathbf{x}_i, y_i)\}_{i=1}^n$$, where $$\mathbf{x} = \mathbf{x} + \delta$$ is the unlearnable version of training example $$\mathbf{x} \in \mathbf{D}_c$$ and $$\delta \in \Delta \subset \mathbb{R}^d$$ is the noise that makes $$\mathbf{x}$$ unlearnable. 
+We denote its unlearnable version by $$\mathbf{D}_u = \{(\mathbf{x}_i, y_i)\}_{i=1}^n$$, where $$\mathbf{x} = \mathbf{x} + \delta$$ is the unlearnable version of training example $$\mathbf{x} \in \mathbf{D}_c$$ and $$\delta \in \Delta \subset \mathbb{R}^d$$ is the noise that makes x unlearnable. 
 
-The noise $$\delta$$ is bounded by $$\|\delta\|_p \leq \epsilon$$, where $$p$$ is the $$\ell_p$$ norm, and is set to be small such that it does not affect the normal utility of the example.
+The noise $$\delta$$ is bounded by $$\|\delta\|_p \leq \epsilon$$, where p is the $$\ell_p$$ norm, and is set to be small such that it does not affect the normal utility of the example.
 
 The DNN model will be trained on $$\mathbf{D}_c$$ to learn the mapping from the input space to the label space: $$f : \mathbf{X} \rightarrow \mathbf{Y}$$. The goal is to trick the model into learning a strong correlation between the noise and the labels: $$f : \Delta \rightarrow \mathbf{Y}, \Delta = \mathbf{X}$$, when trained on $$\mathbf{D}_u$$, the unlearnable version:
 
@@ -342,22 +339,21 @@ $$
 \arg\min_{\theta} \mathbb{E}_{(\mathbf{x}, y) \sim \mathbf{D}_u} \left[ L(f(\mathbf{x}), y) \right]
 $$
 
-where $$L$$ is the classification loss such as the commonly used cross-entropy loss.
+where L is the classification loss such as the commonly used cross-entropy loss.
 
 The noise forms are as follows: sample-wise noise, $$\mathbf{x}_i = \mathbf{x}_i + \delta_i$$, $$\delta_i \in \Delta_s = \{\delta_1, \dots, \delta_n\}$$, while for class-wise noise, $$\mathbf{x}_i = \mathbf{x}_i + \delta_{y_i}$$, $$\delta_{y_i} \in \Delta_c = \{\delta_1, \dots, \delta_K\}$$. Sample-wise noise requires generating unique noise for each individual example, which can limit its practicality. In contrast, class-wise noise applies the same noise to all examples within a specific class, making it more efficient and flexible for real-world applications. However, as we will observe, class-wise noise is more susceptible to detection and exposure.
-
 
 ### Generating Error Minimizing Noise
 
 Ideally, the noise should be generated on an additional dataset that is different from $$\mathbf{D}_c$$. This will involve a class-matching process to find the most appropriate class from the additional dataset for each class to protect in $$\mathbf{D}_c$$. 
 
-To generate the error-minimizing noise $$\delta$$ for training input $$x$$, the following bi-level optimization problem is solved: 
+To generate the error-minimizing noise $$\delta$$ for training input x, the following bi-level optimization problem is solved: 
 
 $$
 \arg\min_{\theta} \mathbb{E}_{(\mathbf{x}, y) \sim \mathbf{D}_c} \left[ \min_{\delta} L(f(\mathbf{x} + \delta), y) \right] \quad \text{s.t.} \quad \|\delta\|_p \leq \epsilon
 $$
 
-where $$f$$ denotes the source model used for noise generation. 
+where f denotes the source model used for noise generation. 
 
 Note that this is a min-min optimization problem: the inner minimization is a constrained optimization problem that finds the $$\ell_p$$-norm bounded noise $$\delta$$ that minimizes the model’s classification loss, while the outer minimization problem finds the parameters $$\theta$$ that also minimize the model’s classification loss.
 
@@ -369,27 +365,27 @@ Although error-maximizing noise is more challenging to overcome than random nois
 
 ![Total Loss Function]({{'/assets/images/32/app3error_curves.png' | relative_url}})
 {: style="width: 800px; max-width: 100%;"}
-*FIGURE X: The unlearnable effectiveness of different types of noise: random, adversarial and error-minimizing noise on CIFAR-10 dataset. The lower the clean test accuracy the more effective of the noise.. Taken from [src]*
+*FIGURE X: The unlearnable effectiveness of different types of noise: random, adversarial and error-minimizing noise on CIFAR-10 dataset. The lower the clean test accuracy the more effective of the noise.. Taken from [3]*
 
 Class-wise noise introduces an explicit correlation with labels, causing the model to learn the noise instead of the actual content, which diminishes its ability to generalize to clean data. This type of noise also disrupts the independent and identically distributed (i.i.d.) assumption between training and test data, making it an effective data protection technique. However, class-wise noise can be partially bypassed through early stopping during training. 
 
 In contrast, sample-wise noise applies unique perturbations to each individual sample without any direct correlation to the labels. This approach ensures that only low-error samples are ignored by the model, while normal and high-error samples continue to aid in learning, making error-minimizing noise more effective in rendering data unlearnable. Consequently, sample-wise error-minimizing noise offers a more robust and versatile method for preventing DNNs from extracting useful information from the training data.
 
 
-### Case Study 
+## Experiments
+### Settings and Methodology
+The authors conducted a case study to demonstrate the application of error-minimizing noise on personal face images, addressing scenario where individuals seek to prevent their facial data from being exploited by FR or verification systems. This involves the defender applying error-minimizing noise to their own face images before sharing them on online social media platforms. These altered, or unlearnable, images are subsequently collected by FR systems to train DNNs. The primary objective is to ensure that DNNs trained on these unlearnable images perform poorly when attempting to recognize the defender’s clean face images captured elsewhere, thereby safeguarding the individual’s privacy.
+
+The experiments are conducted under two distinct settings: partially unlearnable and fully unlearnable. In the partially unlearnable setting, a small subset of identities within the training dataset is made unlearnable. Specifically, 50 identities from the WebFace dataset are selected and augmented with error-minimizing noise using a smaller CelebA-100 subset. 
+
+This results in a training set where 10,525 identities remain clean, while 50 identities are protected. In the fully unlearnable setting, the entire WebFace training dataset is rendered unlearnable. Inception-ResNet models trained on these modified datasets evaluate the effectiveness of the noise against both face recognition and verification tasks. 
 
 ![Total Loss Function]({{'/assets/images/32/case_study_3.png' | relative_url}})
 {: style="width: 800px; max-width: 100%;"}
-*FIGURE X: Preventing exploitation of face data using error-minimizing noise. Taken from [src]*
-
-### Settings and Methodology
-The authors conducted a case study to demonstrate the application of error-minimizing noise on personal face images, addressing scenario where individuals seek to prevent their facial data from being exploited by FR or verification systems. The proposed approach involves the defender applying error-minimizing noise to their own face images before sharing them on online social media platforms. These altered, or unlearnable, images are subsequently collected by FR systems to train DNNs. The primary objective is to ensure that DNNs trained on these unlearnable images perform poorly when attempting to recognize the defender’s clean face images captured elsewhere, thereby safeguarding the individual’s privacy.
-
-The experiments are conducted under two distinct settings: partially unlearnable and fully unlearnable. In the partially unlearnable setting, a small subset of identities within the training dataset is made unlearnable. Specifically, 50 identities from the WebFace dataset are selected and augmented with error-minimizing noise using a smaller CelebA-100 subset. 
-This results in a training set where 10,525 identities remain clean, while 50 identities are protected. In the fully unlearnable setting, the entire WebFace training dataset is rendered unlearnable. Inception-ResNet models trained on these modified datasets evaluate the effectiveness of the noise against both face recognition and verification tasks. 
+*FIGURE X: Preventing exploitation of face data using error-minimizing noise. Taken from [3]*
 
 ### Results
-The study concludes that error-minimizing noise is a viable and practical tool for protecting personal face images from unauthorized use in training FR systems. In the partially unlearnable setting, the recognition accuracy for the 50 protected identities dropped dramatically to 16%, compared to 86% for the remaining clean identities, as shown in the experimental results table. This significant reduction demonstrates the effectiveness of error-minimizing noise in making specific identities unrecognizable.
+The study concludes that error-minimizing noise is a viable tool for protecting personal face images from unauthorized use in training FR systems. In the partially unlearnable setting, the recognition accuracy for the 50 protected identities dropped to 16%, compared to 86% for the remaining clean identities. 
 
 However, the partially unlearnable setting exhibits some limitations due to the presence of ample clean data, which allows the model to maintain relatively good verification performance, albeit with a reduced Area Under the Curve (AUC). In contrast, the fully unlearnable setting achieves a substantial reduction in model performance, with the AUC dropping from 0.9975 in the clean setting to 0.5321. This highlights the potential of error-minimizing noise for comprehensive data protection when applied across the entire dataset.
 
@@ -399,3 +395,5 @@ The findings suggest that error-minimizing noise can significantly enhance data 
 # References
 
 [1] Shan, Wenger, Zhang, Li, Zheng, Zhao. "Fawkes: Protecting Privacy against Unauthorized Deep Learning Models". arXiv [cs.CV] 2020.
+
+[3] Huang, Hanxun, et al. "Unlearnable examples: Making personal data unexploitable." arXiv preprint arXiv:2101.04898 (2021).
