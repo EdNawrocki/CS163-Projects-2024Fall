@@ -7,12 +7,8 @@ date: 2024-12-13
 ---
 
 
-<<<<<<< HEAD
-> ayaya
-=======
 > In this article, we will examine various anti-facial recognition techniques and discuss their effectiveness. First, we will introduce facial recognition 
 
->>>>>>> fc4ddd7a9b189ca3f2f76b7c30cc9a131a7dab61
 
 <!--more-->
 {: class="table-of-content"}
@@ -406,4 +402,10 @@ The findings suggest that error-minimizing noise can significantly enhance data 
 
 [1] Shan, Wenger, Zhang, Li, Zheng, Zhao. "Fawkes: Protecting Privacy against Unauthorized Deep Learning Models". arXiv [cs.CV] 2020.
 
+[2] Kaziakhmedov, Edgar, et al. “Real-world adversarial attack on MTCNN face detection system”. arXiv:1910.06261 [cs.CV]
+
 [3] Huang, Hanxun, et al. "Unlearnable examples: Making personal data unexploitable." arXiv preprint arXiv:2101.04898 (2021).
+
+[4] Wenger, Emily, et al. “Sok: Anti-facial recognition technology.” 2023 IEEE Symposium on Security and Privacy (SP). IEEE, 2023.
+
+[5] Song, V. (2024, October 2). College students used Meta’s smart glasses to dox people in Real time. The Verge. https://www.theverge.com/2024/10/2/24260262/ray-ban-meta-smart-glasses-doxxing-privacy 
