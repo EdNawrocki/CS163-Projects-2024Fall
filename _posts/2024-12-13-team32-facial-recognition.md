@@ -28,6 +28,47 @@ date: 2024-12-13
 ## Introduction
 ayaya
 
+# [Fawkes](https://arxiv.org/abs/2002.08327 "Original Fawkes Paper")
+
+## Motivation
+
+Facial Recognition poses a serious threat to personal privacy in the modern era of surveillance. Privately owned companies like Clearview.ai scrape billions of images from social media to create a model capable of recognizing millions of citizens without their consent. In general, anti facial recognition technology takes the approach of what is known as a poisoning attack in machine learning, making someone’s face difficult to recognize. 
+
+Past attempts include wearables, like glasses or a hat with stickers, which aim to make a person harder to identify. However, these wearables suffer from being clunky, unfashionable, and impractical for daily use. Furthermore, they require full knowledge of the facial recognition system they aim to deceive, which is an unrealistic assumption in the wild. Other attempts use machine learning to edit facial images through use of a GAN or k-means averaging, but these methods alter the content of the image extensively, making them unfit to be used when sharing images on social media.
+
+The Fawkes software targets the third stage of the FR pipeline, aiming to cloak facial images without dramatically altering their appearance. If these cloaked images are shared online and scraped for a facial recognition database, the poisoned image would provide the embedding for face verification. When a clean image is captured in the wild through surveillance technology, it would not find a match in the database as the poisoned embedding is effectively dissimilar to the unaltered facial embedding. The flow of this system is demonstrated in Figure 1. 
+
+![Image](../assets/images/32/Fawkes_System.png)
+*Fig 1. The Fawkes system aims to disrupt facial recognition by poisoning the training database. [[1]](#references)*
+
+Some challenges to this technology are as follows:
+1. Image labels remain the same during the poisoning process, as they are posted to a known account, so the scope of the attack is limited to editing image contents
+2. The cloak should be imperceptible, meaning the use of the image for human eyes is not negatively impacted.
+3. The cloak should work regardless of facial detection model architecture.
+
+## Optimizing Cloak Perturbations
+
+The generation of a cloak for a given image can be imagined as a constrained optimization problem, where C is the cloaking function, “Model” is the feature extractor used by the model, x is the original image, x_T is the target image and x ⊕ C(x,x_T) is the cloaked image.
+
+![Image](../assets/images/32/Fawkes_Contrained_Optimization.png)
+
+Here, rho is the amount that we are allowing the image to be deviated by. When the real model used by facial recognition technology differs from the model used in cloaking optimization, Fawkes relies on the transferability effect, the property that models trained for similar tasks share similar properties, such as the facial vector embedding. 
+
+We can convert the optimization problem into this form:
+
+![Image](../assets/images/32/Fawkes_Loss_1.png)
+
+where taking lambda to infinity would make the image visually identical to the original image by heavily penalizing a cloaking distance larger than rho. This loss function uses the DSSIM (Structural Dis-Similarity Index) to determine if the cloak has overtaken rho in magnitude. Previous work has deemed DSSIM a useful metric at measuring user-perceived image distortion, an unexpected quality of feature vectors extracted by deep learning.
+
+## Results
+
+Figure 2 shows a visualization of the effectiveness of cloaking when training on poisoned images. 
+
+![Image](../assets/images/32/Fawkes_Results.png)
+*Fig 2. Shown is a plot of embedding vectors after principal component analysis with the impact of cloaking demonstrated in (b). [[1]](#references)*
+
+When training the cloak on a known feature extractor the Fawkes method achieved 100% accuracy when rho, the perturbation margin, is allowed to be greater than 0.005 which is barely detectable to the human eye. As demonstrated in the figure, the cloak is highly effective at changing the representation of the feature vector. However, it is not alway possible to know the feature extraction method of the target model. By using robust feature extractors, models that are trained adversarially to decrease sensitivity to input perturbations can be used as global feature extractors to train the cloaking to work against an unknown model. Using this method, Fawkes is able to achieve a protection success rate greater than 95%. When tested on Microsoft Azure Face API, Amazon Rekognition Face Verification, and Face++, the robust model is able to achieve 100% protection against all three. 
+
 ## MTCNN-Attack
 
 ### Motivation
@@ -84,3 +125,200 @@ Tests were performed to evaluate the probability of misdetection for both the ba
 
 There are several issues that are worth consideration, however. Firstly, the completely unpatched database used to match patched and unpatched samples with people only contained images of the people in the sames (a “targeted” attack); this means that further investigation must be performed to evaluate whether or not the learned patches perform as well for the general human population, or whether transferability is an issue that must be addressed in the future. Secondly, there is an element of impracticality associated with this project, as one must be wearing the black-and-white checkered marks to denote where the patches should be located. Generally, this may be deemed unsuitable for everyday use. But overall, the results show a considerable improvement with the learned patches as opposed to unpatched, suggesting that the model conceivably could be used to prevent facial identification in the future.
 
+## Evaluating Fawkes on PubFig
+
+First, I download the pubfig face database from kaggle for use as a dataset.
+
+
+```python
+# installing pubfaces
+import kagglehub
+
+# Download latest version
+path = kagglehub.dataset_download("kaustubhchaudhari/pubfig-dataset-256x256-jpg")
+
+print("Path to dataset files:", path)
+```
+
+    Warning: Looks like you're using an outdated `kagglehub` version, please consider updating (latest version: 0.3.5)
+    Downloading from https://www.kaggle.com/api/v1/datasets/download/kaustubhchaudhari/pubfig-dataset-256x256-jpg?dataset_version_number=1...
+
+
+    100%|██████████| 176M/176M [00:03<00:00, 50.9MB/s]
+
+    Extracting files...
+
+
+    
+
+
+    Path to dataset files: /root/.cache/kagglehub/datasets/kaustubhchaudhari/pubfig-dataset-256x256-jpg/versions/1
+
+
+I installed the deepface repository for facial detection, which comes with a variety of models to use, including VGG-Face, Facenet, OpenFace and DeepFace.
+
+
+```python
+pip install deepface
+```
+
+```python
+from deepface import DeepFace
+```
+
+    24-12-14 01:21:24 - Directory /root/.deepface has been created
+    24-12-14 01:21:24 - Directory /root/.deepface/weights has been created
+
+
+
+```python
+from google.colab import files
+```
+
+For reference, two images of the same person (Bolei Zhou in this case) will generate a distance score of around 0.2 to .4 if taken from a similar angle with similar lighting.
+
+
+```python
+result = DeepFace.verify(
+    img1_path = 'images?q=tbn:ANd9GcSYXqI16ROGe18ZVawkpYLCGnqG76Td7WTMRw',
+    img2_path = 'prof_pic.jpg'
+)
+```
+
+    24-12-04 00:24:31 - vgg_face_weights.h5 will be downloaded...
+
+
+    Downloading...
+    From: https://github.com/serengil/deepface_models/releases/download/v1.0/vgg_face_weights.h5
+    To: /root/.deepface/weights/vgg_face_weights.h5
+    100%|██████████| 580M/580M [00:06<00:00, 84.1MB/s]
+
+
+
+```python
+print(result)
+```
+
+    {'verified': True, 'distance': 0.36161117870795056, 'threshold': 0.68, 'model': 'VGG-Face', 'detector_backend': 'opencv', 'similarity_metric': 'cosine', 'facial_areas': {'img1': {'x': 65, 'y': 40, 'w': 84, 'h': 84, 'left_eye': (122, 72), 'right_eye': (90, 72)}, 'img2': {'x': 229, 'y': 140, 'w': 440, 'h': 440, 'left_eye': (523, 321), 'right_eye': (366, 321)}}, 'time': 14.65}
+
+
+On my personal computer I downloaded the fawkes model and applied it to a picture of our professor, Bolei Zhou.
+
+
+```python
+fawkes_bolei = files.upload()
+```
+
+    Saving prof_pic_cloaked.png to prof_pic_cloaked.png
+
+For reference, here is the original image:
+
+![image](../assets/images/32/prof_pic.jpg)
+
+And here is the cloaked image:
+
+![image](../assets/images/32/prof_pic_cloaked.png)
+
+I also download a different, uncloaked picture which I will use for face identification against the picture.
+
+
+```python
+! wget -O Bolei_Zhou.png https://iu35-prod.s3.amazonaws.com/images/Bolei_Zhou_1.width-3000.png
+```
+
+    --2024-12-14 01:21:41--  https://iu35-prod.s3.amazonaws.com/images/Bolei_Zhou_1.width-3000.png
+    Resolving iu35-prod.s3.amazonaws.com (iu35-prod.s3.amazonaws.com)... 16.15.179.28, 52.217.200.129, 3.5.27.183, ...
+    Connecting to iu35-prod.s3.amazonaws.com (iu35-prod.s3.amazonaws.com)|16.15.179.28|:443... connected.
+    HTTP request sent, awaiting response... 200 OK
+    Length: 2759019 (2.6M) [image/png]
+    Saving to: ‘Bolei_Zhou.png’
+    
+    Bolei_Zhou.png      100%[===================>]   2.63M  6.00MB/s    in 0.4s    
+    
+    2024-12-14 01:21:42 (6.00 MB/s) - ‘Bolei_Zhou.png’ saved [2759019/2759019]
+    
+
+
+I insert the cloaked version of professor Bolei's face into the directory to be picked up by the database.
+
+
+```python
+! mkdir /root/.cache/kagglehub/datasets/kaustubhchaudhari/pubfig-dataset-256x256-jpg/versions/1/CelebDataProcessed/'Bolei Zhou'/
+```
+
+
+```python
+! mv prof_pic_cloaked.png /root/.cache/kagglehub/datasets/kaustubhchaudhari/pubfig-dataset-256x256-jpg/versions/1/CelebDataProcessed/'Bolei Zhou'/100.jpg
+```
+
+Here I test VGG-Face to see if the faces can be verified when compared directly.
+
+
+```python
+result = DeepFace.verify(
+    img1_path = 'Bolei_Zhou.png',
+    img2_path = 'prof_pic_cloaked.png'
+)
+print(result)
+```
+
+    {'verified': True, 'distance': 0.43934390986504535, 'threshold': 0.68, 'model': 'VGG-Face', 'detector_backend': 'opencv', 'similarity_metric': 'cosine', 'facial_areas': {'img1': {'x': 603, 'y': 476, 'w': 822, 'h': 822, 'left_eye': (1168, 798), 'right_eye': (860, 795)}, 'img2': {'x': 232, 'y': 144, 'w': 432, 'h': 432, 'left_eye': (523, 321), 'right_eye': (364, 322)}}, 'time': 7.93}
+
+
+It turns out that even with the cloak, VGG-Face is still able to detect the same face with a high enough similarity. Next, I test a variety of models, trying to find a match for the normal image against the whole database, including the cloaked version of professor Zhou.
+
+
+```python
+dfs = DeepFace.find(
+  img_path = "Bolei_Zhou.png",
+  db_path = "/root/.cache/kagglehub/datasets/kaustubhchaudhari/pubfig-dataset-256x256-jpg/versions/1/CelebDataProcessed",
+)
+```
+
+```python
+import pandas as pd
+```
+
+```python
+if isinstance(dfs, pd.DataFrame):
+    dfs.to_csv("matches.csv", index=False)
+else:
+    for i, df in enumerate(dfs):
+        df.to_csv(f"matches_model_{i + 1}.csv", index=False)
+
+```
+
+The output into dfs is a list of pandas dataframes, one for each model if a match was found. Here I downloaded the csv files for inspection.
+
+
+```python
+files.download("matches_model_1.csv")
+files.download("matches_model_2.csv")
+files.download("matches_model_3.csv")
+```
+
+Each model was trying to find a match for the uncloaked picture of Bolei Zhou, where there was one correct match in the database.
+
+![image](../assets/images/32/Bolei_Zhou.png)
+
+The best model by far was VGG-Face. It's highest match to the uncloaked Bolei Zhou was the correct image, the cloaked version inserted into the database, with distance 0.44. 
+
+It's next highest match with a distance of 0.66 was an image of Michelle Wei.
+
+![image](../assets/images/32/Michelle_Wie.jpg)
+
+Facenet was completely fooled by the cloaking, and had the highest match an image of Shinzo Abe, with a distance of 0.25. It did not match the cloaked image of Bolei with the given image under the threshold.
+
+![image](../assets/images/32/Shinzo_Abe.jpg)
+
+OpenFace was also fooled by the cloaking, and gave an image of Steven Spielberg as being the closest to the given image, with a distance of 0.21. It also did not match the cloaked image of Bolei.
+
+![image](../assets/images/32/Steven_Spielberg.jpg)
+
+DeepFace was unable to find a match under the threshold.
+
+These results show that while Fawkes is still effective against some models four years after the original paper was published, advances in the VGG-Face model have surpassed this cloaking technique, at least when put up against a smaller dataset like PubFig.
+
+# References
+
+[1] Shan, Wenger, Zhang, Li, Zheng, Zhao. "Fawkes: Protecting Privacy against Unauthorized Deep Learning Models". arXiv [cs.CV] 2020.
