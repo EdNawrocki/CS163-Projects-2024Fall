@@ -6,9 +6,7 @@ author: Edward Nawrocki, Donovan Rimer, Tyler Cho
 date: 2024-12-13
 ---
 
-
-> In this article, we will examine various anti-facial recognition techniques and discuss their effectiveness. First, we will introduce facial recognition 
-
+> In this article, we will examine various anti-facial recognition techniques and discuss their effectiveness. First, we will introduce facial recognition...
 
 <!--more-->
 {: class="table-of-content"}
