@@ -7,7 +7,7 @@ date: 2024-01-01
 ---
 
 
-> This block is a brief introduction of your project. You can put your abstract here or any headers you want the readers to know.
+> This block is a brief introduction of your project. Test
 
 
 <!--more-->
@@ -28,8 +28,6 @@ You can add an image to your survey like this:
 *Fig 1. YOLO: An object detection method in computer vision* [1].
 
 Please cite the image if it is taken from other people's work.
-
-
 
 ## Unlearnable Examples
 # Introduction
