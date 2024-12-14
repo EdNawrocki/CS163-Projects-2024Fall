@@ -46,31 +46,31 @@ Three distinct loss functions are used to develop adversarial patches.
 - L2 loss and Lclf were both used to quantify face classification loss. 
 - To make the grayscale patches as natural as possible, total variation loss Ltv was defined for a given pixel p(i, j) to penalize sharp transitions and noise within the patch patterns:
 
-![Total Variation Loss Function]({{'/assets/images/TylerCho/Ltv.png' | relative_url}})
+![Total Variation Loss Function]({{'/assets/images/32/Ltv.png' | relative_url}})
 {: style="width: 400px; max-width: 100%;"}
 *Equation X. The loss function for total variation loss. Taken from [src]*
 
 - Testing was also performed on samples where portions of the face were obscured by surgical masks; the authors found that, in these cases, the amount of black used could be penalized to make the patches look more natural. They defined black penalty loss, Lblk, as the following for a given pixel p(i, j):
 
-![Black Loss Function]({{'/assets/images/TylerCho/Lblk.png' | relative_url}})
+![Black Loss Function]({{'/assets/images/32/Lblk.png' | relative_url}})
 {: style="width: 400px; max-width: 100%;"}
 *Equation X+1. The loss function for black loss. Taken from [src]*
 
 Together, the total loss was defined using the function below, where α and β are scaling factors that control the contributions of total variance loss and black loss, respectively.
 
-![Total Loss Function]({{'/assets/images/TylerCho/L.png' | relative_url}})
+![Total Loss Function]({{'/assets/images/32/L.png' | relative_url}})
 {: style="width: 400px; max-width: 100%;"}
 *Equation X+2. The loss function for the total loss, combining Lclf, Ltv and Lblk with their weighted factors. Taken from [src]*
 
 Both α and β were hyperparameters that were each individually optimized for. These three losses are evaluated together, summed, and back propagated to the patches for them to update. This training process continued for 2000 epochs per pair of patches.
 
-![MTCNN-Attack Attack Pipeline]({{'/assets/images/TylerCho/pipeline.png' | relative_url}})
+![MTCNN-Attack Attack Pipeline]({{'/assets/images/32/pipeline.png' | relative_url}})
 {: style="width: 800px; max-width: 200%;"}
 *Fig. 3. The attack pipeline for MTCNN-Attack. A pair of patches is applied to N images and goes through data augmentation. The resulting images are fed through proposal networks to calculate classification loss, which is used alongside two other custom losses to update the patches through backpropagation. Taken from [src]*
 
 Another concern was the applicability of this methodology in real-time scenarios. In realistic cases, factors like lighting or angling differences could decrease the effectiveness of the patches. To account for this, Kaziakhmedov et al. used multiple images with different head positions and lighting for each sample, and marked each of the patch boundaries for each image. This allowed them to implement Expectation-over-Transformation (EoT) and projective transformations, which increase model effectiveness by ensuring that the patches are mapped correctly.
 
-![Patch Mapping for a Sample]({{'/assets/images/TylerCho/projmap.png' | relative_url}})
+![Patch Mapping for a Sample]({{'/assets/images/32/projmap.png' | relative_url}})
 {: style="width: 800px; max-width: 200%;"}
 *Fig. 4. An example of the sample input and the resultant patch mapping for the MTCNN-Attack model. Both EoT and projective mapping were used to ensure optimal patch placement. Taken from [src]*
 
@@ -78,7 +78,7 @@ Another concern was the applicability of this methodology in real-time scenarios
 
 Tests were performed to evaluate the probability of misdetection for both the bare-faced (cheeks) and masked datasets, and both unpatched and patched tests were considered. 2000 epochs were trained for the patches, and each result was averaged over a series of 1000 frames for each scale step factor. Scale step factors were valued at {0.709, 0.82, 0.9, and 0.95}. Over the range of scale steps, the probability of misdetection averaged slightly below 0.9 for the patched tests, and slightly below 0.2 for the unpatched for cheek; for masked, the model performed slightly worse, averaging slightly above 0.8 for patched and slightly above 0.2 for unpatched. 
 
-![Test Results]({{'/assets/images/TylerCho/results.png' | relative_url}})
+![Test Results]({{'/assets/images/32/results.png' | relative_url}})
 {: style="width: 800px; max-width: 200%;"}
 *Fig. 5. The test results for both cheek and masked trials. Both tests show a strong misdetection performance for patched trials, especially when compared to unpatched trials. Taken from [src]*
 
