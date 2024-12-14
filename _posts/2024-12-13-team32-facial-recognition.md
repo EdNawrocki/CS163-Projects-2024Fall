@@ -6,7 +6,7 @@ author: Edward Nawrocki, Donovan Rimer, Tyler Cho
 date: 2024-12-13
 ---
 
-> In this article, we will examine various anti-facial recognition techniques and discuss their effectiveness. First, we will introduce facial recognition...
+> In this article, we examine various anti-facial recognition techniques and assess their effectiveness. We begin by introducing facial recognition and providing a high-level overview of its pipeline. Next, we explore how Fawkes software exploits vulnerabilities in image cloaking by testing it on the PubFig database. We then discuss MTCNN-Attack, which prevents models from recognizing facial features by overlaying grayscale patches on individuals' faces. Finally, we present a method that adds noise to images, rendering them unlearnable to models while remaining visually indistinguishable to the naked eye.
 
 <!--more-->
 {: class="table-of-content"}
@@ -25,12 +25,22 @@ date: 2024-12-13
 
 # Introduction
 
-Emerging as one of the most prominent applications of computer vision, facial recognition is a technology that identifies faces from an image input to match with a known identity. There are various algorithms that it can be used in, such as one-to-one matching, which compares an individual’s face to their claimed identity, and one-to-many, which would query this face with many others in a database to determine their identity out of a pool. Because of its versatility, facial recognition has been incorporated into many different aspects of our lives, from creating specialized albums of various contacts to security screening used by airport TSA. 
+Facial Recognition (FR) systems are designed to identify individuals by analyzing and comparing their facial characteristics. Unlike facial verification systems, which primarily authenticate users on devices (such as Apple's FaceID by matching a user’s face to a single stored feature vector), FR systems focus on recognizing individuals from a larger pool of known identities.
 
-The earliest facial detection models were cascade-based; one prototypical model, developed by Paul Viola and Michael Jones in 2001, discarded image backgrounds to quickly identify critical facial features. Neural network-based models grew in popularity in the 2010s as our understanding of the system developed. Today, many models make use of high-performing vision transformers to encode key features and their positional information as tokens, passing these tokens through transformer layers and obtaining classification tokens to make their judgments.
+However, as facial recognition technology becomes increasingly integrated into daily life, privacy and security concerns have emerged. This has led to the development of anti-facial recognition (AFR) tools that strategically target vulnerabilities in the FR pipeline to prevent accurate identification of individuals.
 
-However, as facial recognition technology has become more and more integrated into daily life, questions over privacy and security concerns have arisen. For example, Verge tech reporter Victoria Song reported this past October that Harvard students were able to take advantage of the Instagram live feature with Meta’s smart glasses to identify people in real-time. These growing concerns over privacy have prompted an increase in adversarial models to interfere with recognition technologies, three examples of which will be examined in further detail below.
+### FR Pipeline
+![Patch Mapping for a Sample]({{'/assets/images/32/fr_pipeline.png' | relative_url}})
+{: style="width: 800px; max-width: 200%;"}
+*Fig. 1. Division of the facial recognition pipeline into 5 stages. Taken from [4]*
+The operational workflow of FR systems can be divided into five critical stages:
+1. **Image Collection**: FR systems gather face images from various sources, including online scraping or capturing photos directly. This stage is foundational, as the quality and diversity of collected images significantly impact the system's effectiveness.
+2. **Image Preprocessing**: Preprocessing involves detecting and cropping faces from images, followed by normalizing the data to ensure uniformity. This step enhances the quality of the input data, making it suitable for accurate feature extraction.
+3. **Training Feature Extractor**: Typically a deep neural network (DNN) trained to convert face images into mathematical feature vectors. These vectors are designed to be similar for images of the same person and distinct for different individuals. Training requires vast amounts of labeled data and computational resources.
+4. **Reference Database Creation**: Creating a reference database involves storing feature vectors alongside corresponding identities, enabling the system to compare and identify faces accurately. The database must be extensive and well-organized to facilitate quick and reliable matching during the recognition process.
+5. **Query Matching**: In real-time operation, the FR system processes an unidentified face image by extracting its feature vector and comparing it against the reference database. Using distance metrics like L2 or cosine similarity, the system identifies the closest match and retrieves the associated identity if the similarity
 
+AFR tools strategically target one or more of the five stages in the FR pipeline to prevent accurate identification of individuals, such as Fawkes acting on the fourth stage and Unlearnable Examples on the third.
 
 ## [Fawkes](https://arxiv.org/abs/2002.08327 "Original Fawkes Paper")
 
@@ -42,7 +52,7 @@ Past attempts include wearables, like glasses or a hat with stickers, which aim 
 
 The Fawkes software targets the third stage of the FR pipeline, aiming to cloak facial images without dramatically altering their appearance. If these cloaked images are shared online and scraped for a facial recognition database, the poisoned image would provide the embedding for face verification. When a clean image is captured in the wild through surveillance technology, it would not find a match in the database as the poisoned embedding is effectively dissimilar to the unaltered facial embedding. The flow of this system is demonstrated in Figure 1. 
 
-![The Fawkes System]({{'/assets/images/32/Fawkes_System.png' | relative_url}})
+![Image](../assets/images/32/Fawkes_System.png)
 *Fig 1. The Fawkes system aims to disrupt facial recognition by poisoning the training database. [[1]](#references)*
 
 Some challenges to this technology are as follows:
@@ -54,13 +64,13 @@ Some challenges to this technology are as follows:
 
 The generation of a cloak for a given image can be imagined as a constrained optimization problem, where C is the cloaking function, “Model” is the feature extractor used by the model, x is the original image, x_T is the target image and x ⊕ C(x,x_T) is the cloaked image.
 
-![Fawkes Constrained Optimization]({{'/assets/images/32/Fawkes_Contrained_Optimization.png' | relative_url}})
+![Image](../assets/images/32/Fawkes_Contrained_Optimization.png)
 
 Here, rho is the amount that we are allowing the image to be deviated by. When the real model used by facial recognition technology differs from the model used in cloaking optimization, Fawkes relies on the transferability effect, the property that models trained for similar tasks share similar properties, such as the facial vector embedding. 
 
 We can convert the optimization problem into this form:
 
-![Fawkes Loss]({{'/assets/images/32/Fawkes_Loss_1.png' | relative_url}})
+![Image](../assets/images/32/Fawkes_Loss_1.png)
 
 where taking lambda to infinity would make the image visually identical to the original image by heavily penalizing a cloaking distance larger than rho. This loss function uses the DSSIM (Structural Dis-Similarity Index) to determine if the cloak has overtaken rho in magnitude. Previous work has deemed DSSIM a useful metric at measuring user-perceived image distortion, an unexpected quality of feature vectors extracted by deep learning.
 
@@ -68,67 +78,11 @@ where taking lambda to infinity would make the image visually identical to the o
 
 Figure 2 shows a visualization of the effectiveness of cloaking when training on poisoned images. 
 
-![Fawkes Results]({{'/assets/images/32/Fawkes_Results.png' | relative_url}})
-
+![Image](../assets/images/32/Fawkes_Results.png)
 *Fig 2. Shown is a plot of embedding vectors after principal component analysis with the impact of cloaking demonstrated in (b). [[1]](#references)*
 
 When training the cloak on a known feature extractor the Fawkes method achieved 100% accuracy when rho, the perturbation margin, is allowed to be greater than 0.005 which is barely detectable to the human eye. As demonstrated in the figure, the cloak is highly effective at changing the representation of the feature vector. However, it is not alway possible to know the feature extraction method of the target model. By using robust feature extractors, models that are trained adversarially to decrease sensitivity to input perturbations can be used as global feature extractors to train the cloaking to work against an unknown model. Using this method, Fawkes is able to achieve a protection success rate greater than 95%. When tested on Microsoft Azure Face API, Amazon Rekognition Face Verification, and Face++, the robust model is able to achieve 100% protection against all three. 
 
-# MTCNN-Attack
-
-### Motivation
-
-An alternative approach to the identity masking that Fawkes proposes is preventing the identification of facial features altogether. In their proposed model MTCNN-Attack, authors Kaziakhmedov et al. aim to use physical domain attacks to prevent facial features from being properly identified by multi-task cascaded CNNs (MTCNNs). MTCNNs make use of several sub-networks to identify faces:
-
-1. Proposal networks (P-Nets): performs preliminary facial detection by proposing bounding boxes that contain potential face candidates
-2. Refine networks (R-Nets): improves detection by eliminating false positive proposals and refining the locations and dimensions of the remaining boxes
-3. Output network: detects facial landmark locations and outputs the final bounding box(es)
-
-Their method of choice attacks the first stage of this process, as it presents an opportunity to minimize the most computation costs. By placing grayscale-patterned patches (a common physical domain attack method) onto the cheek areas of face images and using various transformation techniques to ensure robustness, their model has displayed success in preventing the recognition of faces.
-
-### Optimizing Patches
-
-Three distinct loss functions are used to develop adversarial patches. 
-- L2 loss and Lclf were both used to quantify face classification loss. 
-- To make the grayscale patches as natural as possible, total variation loss Ltv was defined for a given pixel p(i, j) to penalize sharp transitions and noise within the patch patterns:
-
-![Total Variation Loss Function]({{'/assets/images/32/Ltv.png' | relative_url}})
-{: style="width: 400px; max-width: 100%;"}
-*Equation X. The loss function for total variation loss. Taken from [src]*
-
-- Testing was also performed on samples where portions of the face were obscured by surgical masks; the authors found that, in these cases, the amount of black used could be penalized to make the patches look more natural. They defined black penalty loss, Lblk, as the following for a given pixel p(i, j):
-
-![Black Loss Function]({{'/assets/images/32/Lblk.png' | relative_url}})
-{: style="width: 400px; max-width: 100%;"}
-*Equation X+1. The loss function for black loss. Taken from [src]*
-
-Together, the total loss was defined using the function below, where α and β are scaling factors that control the contributions of total variance loss and black loss, respectively.
-
-![Total Loss Function]({{'/assets/images/32/L.png' | relative_url}})
-{: style="width: 400px; max-width: 100%;"}
-*Equation X+2. The loss function for the total loss, combining Lclf, Ltv and Lblk with their weighted factors. Taken from [src]*
-
-Both α and β were hyperparameters that were each individually optimized for. These three losses are evaluated together, summed, and back propagated to the patches for them to update. This training process continued for 2000 epochs per pair of patches.
-
-![MTCNN-Attack Attack Pipeline]({{'/assets/images/32/pipeline.png' | relative_url}})
-{: style="width: 800px; max-width: 200%;"}
-*Fig. 3. The attack pipeline for MTCNN-Attack. A pair of patches is applied to N images and goes through data augmentation. The resulting images are fed through proposal networks to calculate classification loss, which is used alongside two other custom losses to update the patches through backpropagation. Taken from [src]*
-
-Another concern was the applicability of this methodology in real-time scenarios. In realistic cases, factors like lighting or angling differences could decrease the effectiveness of the patches. To account for this, Kaziakhmedov et al. used multiple images with different head positions and lighting for each sample, and marked each of the patch boundaries for each image. This allowed them to implement Expectation-over-Transformation (EoT) and projective transformations, which increase model effectiveness by ensuring that the patches are mapped correctly.
-
-![Patch Mapping for a Sample]({{'/assets/images/32/projmap.png' | relative_url}})
-{: style="width: 800px; max-width: 200%;"}
-*Fig. 4. An example of the sample input and the resultant patch mapping for the MTCNN-Attack model. Both EoT and projective mapping were used to ensure optimal patch placement. Taken from [src]*
-
-### Results
-
-Tests were performed to evaluate the probability of misdetection for both the bare-faced (cheeks) and masked datasets, and both unpatched and patched tests were considered. 2000 epochs were trained for the patches, and each result was averaged over a series of 1000 frames for each scale step factor. Scale step factors were valued at {0.709, 0.82, 0.9, and 0.95}. Over the range of scale steps, the probability of misdetection averaged slightly below 0.9 for the patched tests, and slightly below 0.2 for the unpatched for cheek; for masked, the model performed slightly worse, averaging slightly above 0.8 for patched and slightly above 0.2 for unpatched. 
-
-![Test Results]({{'/assets/images/32/results.png' | relative_url}})
-{: style="width: 800px; max-width: 200%;"}
-*Fig. 5. The test results for both cheek and masked trials. Both tests show a strong misdetection performance for patched trials, especially when compared to unpatched trials. Taken from [src]*
-
-There are several issues that are worth consideration, however. Firstly, the completely unpatched database used to match patched and unpatched samples with people only contained images of the people in the sames (a “targeted” attack); this means that further investigation must be performed to evaluate whether or not the learned patches perform as well for the general human population, or whether transferability is an issue that must be addressed in the future. Secondly, there is an element of impracticality associated with this project, as one must be wearing the black-and-white checkered marks to denote where the patches should be located. Generally, this may be deemed unsuitable for everyday use. But overall, the results show a considerable improvement with the learned patches as opposed to unpatched, suggesting that the model conceivably could be used to prevent facial identification in the future.
 
 ## Evaluating Fawkes on PubFig
 
@@ -218,11 +172,11 @@ fawkes_bolei = files.upload()
 
 For reference, here is the original image:
 
-![Prof Pic]({{'/assets/images/32/prof_pic.jpg' | relative_url}})
+![image](../assets/images/32/prof_pic.jpg)
 
 And here is the cloaked image:
 
-![Prof Pic Cloaked]({{'/assets/images/32/prof_pic_cloaked.png' | relative_url}})
+![image](../assets/images/32/prof_pic_cloaked.png)
 
 I also download a different, uncloaked picture which I will use for face identification against the picture.
 
@@ -304,27 +258,83 @@ files.download("matches_model_3.csv")
 
 Each model was trying to find a match for the uncloaked picture of Bolei Zhou, where there was one correct match in the database.
 
-![Bolei Zhou]({{'/assets/images/32/Bolei_Zhou.png' | relative_url}})
+![image](../assets/images/32/Bolei_Zhou.png)
 
 The best model by far was VGG-Face. It's highest match to the uncloaked Bolei Zhou was the correct image, the cloaked version inserted into the database, with distance 0.44. 
 
 It's next highest match with a distance of 0.66 was an image of Michelle Wei.
 
-![Michelle Wie]({{'/assets/images/32/Michelle_Wie.jpg' | relative_url}})
+![image](../assets/images/32/Michelle_Wie.jpg)
 
 Facenet was completely fooled by the cloaking, and had the highest match an image of Shinzo Abe, with a distance of 0.25. It did not match the cloaked image of Bolei with the given image under the threshold.
 
-![Shinzo Abe]({{'/assets/images/32/Shinzo_Abe.jpg' | relative_url}})
+![image](../assets/images/32/Shinzo_Abe.jpg)
 
 OpenFace was also fooled by the cloaking, and gave an image of Steven Spielberg as being the closest to the given image, with a distance of 0.21. It also did not match the cloaked image of Bolei.
 
-![Steven Spielberg]({{'/assets/images/32/Steven_Spielberg.jpg' | relative_url}})
+![image](../assets/images/32/Steven_Spielberg.jpg)
 
 DeepFace was unable to find a match under the threshold.
 
 These results show that while Fawkes is still effective against some models four years after the original paper was published, advances in the VGG-Face model have surpassed this cloaking technique, at least when put up against a smaller dataset like PubFig.
 
-# Unlearnable Examples
+# [MTCNN-Attack](https://arxiv.org/pdf/1910.06261 "MTCNN-Attack Paper")
+
+### Motivation
+
+An alternative approach to the identity masking that Fawkes proposes is preventing the identification of facial features altogether. In their proposed model MTCNN-Attack, authors Kaziakhmedov et al. aim to use physical domain attacks to prevent facial features from being properly identified by multi-task cascaded CNNs (MTCNNs). MTCNNs make use of several sub-networks to identify faces:
+
+1. Proposal networks (P-Nets): performs preliminary facial detection by proposing bounding boxes that contain potential face candidates
+2. Refine networks (R-Nets): improves detection by eliminating false positive proposals and refining the locations and dimensions of the remaining boxes
+3. Output network: detects facial landmark locations and outputs the final bounding box(es)
+
+Their method of choice attacks the first stage of this process, as it presents an opportunity to minimize the most computation costs. By placing grayscale-patterned patches (a common physical domain attack method) onto the cheek areas of face images and using various transformation techniques to ensure robustness, their model has displayed success in preventing the recognition of faces.
+
+### Optimizing Patches
+
+Three distinct loss functions are used to develop adversarial patches. 
+- L2 loss and Lclf were both used to quantify face classification loss. 
+- To make the grayscale patches as natural as possible, total variation loss Ltv was defined for a given pixel p(i, j) to penalize sharp transitions and noise within the patch patterns:
+
+![Total Variation Loss Function]({{'/assets/images/32/Ltv.png' | relative_url}})
+{: style="width: 400px; max-width: 100%;"}
+*Equation 1. The loss function for total variation loss. Taken from [[2]](#references)*
+
+- Testing was also performed on samples where portions of the face were obscured by surgical masks; the authors found that, in these cases, the amount of black used could be penalized to make the patches look more natural. They defined black penalty loss, Lblk, as the following for a given pixel p(i, j):
+
+![Black Loss Function]({{'/assets/images/32/Lblk.png' | relative_url}})
+{: style="width: 400px; max-width: 100%;"}
+*Equation 2. The loss function for black loss. Taken from [[2]](#references)*
+
+Together, the total loss was defined using the function below, where α and β are scaling factors that control the contributions of total variance loss and black loss, respectively.
+
+![Total Loss Function]({{'/assets/images/32/L.png' | relative_url}})
+{: style="width: 400px; max-width: 100%;"}
+*Equation 3. The loss function for the total loss, combining Lclf, Ltv and Lblk with their weighted factors. Taken from [[2]](#references)*
+
+Both α and β were hyperparameters that were each individually optimized for. These three losses are evaluated together, summed, and back propagated to the patches for them to update. This training process continued for 2000 epochs per pair of patches.
+
+![MTCNN-Attack Attack Pipeline]({{'/assets/images/32/pipeline.png' | relative_url}})
+{: style="width: 800px; max-width: 200%;"}
+*Fig. 3. The attack pipeline for MTCNN-Attack. A pair of patches is applied to N images and goes through data augmentation. The resulting images are fed through proposal networks to calculate classification loss, which is used alongside two other custom losses to update the patches through backpropagation. Taken from [[2]](#references)*
+
+Another concern was the applicability of this methodology in real-time scenarios. In realistic cases, factors like lighting or angling differences could decrease the effectiveness of the patches. To account for this, Kaziakhmedov et al. used multiple images with different head positions and lighting for each sample, and marked each of the patch boundaries for each image. This allowed them to implement Expectation-over-Transformation (EoT) and projective transformations, which increase model effectiveness by ensuring that the patches are mapped correctly.
+
+![Patch Mapping for a Sample]({{'/assets/images/32/projmap.png' | relative_url}})
+{: style="width: 800px; max-width: 200%;"}
+*Fig. 4. An example of the sample input and the resultant patch mapping for the MTCNN-Attack model. Both EoT and projective mapping were used to ensure optimal patch placement. Taken from [[2]](#references)*
+
+### Results
+
+Tests were performed to evaluate the probability of misdetection for both the bare-faced (cheeks) and masked datasets, and both unpatched and patched tests were considered. 2000 epochs were trained for the patches, and each result was averaged over a series of 1000 frames for each scale step factor. Scale step factors were valued at {0.709, 0.82, 0.9, and 0.95}. Over the range of scale steps, the probability of misdetection averaged slightly below 0.9 for the patched tests, and slightly below 0.2 for the unpatched for cheek; for masked, the model performed slightly worse, averaging slightly above 0.8 for patched and slightly above 0.2 for unpatched. 
+
+![Test Results]({{'/assets/images/32/results.png' | relative_url}})
+{: style="width: 800px; max-width: 200%;"}
+*Fig. 5. The test results for both cheek and masked trials. Both tests show a strong misdetection performance for patched trials, especially when compared to unpatched trials. Taken from [[2]](#references)*
+
+There are several issues that are worth consideration, however. Firstly, the completely unpatched database used to match patched and unpatched samples with people only contained images of the people in the sames (a “targeted” attack); this means that further investigation must be performed to evaluate whether or not the learned patches perform as well for the general human population, or whether transferability is an issue that must be addressed in the future. Secondly, there is an element of impracticality associated with this project, as one must be wearing the black-and-white checkered marks to denote where the patches should be located. Generally, this may be deemed unsuitable for everyday use. But overall, the results show a considerable improvement with the learned patches as opposed to unpatched, suggesting that the model conceivably could be used to prevent facial identification in the future.
+
+# [Unlearnable Examples](https://arxiv.org/abs/2101.04898 "Unlearnable Examples Paper")
 ### Introduction
 Unlearnable Examples is an AFR technique designed to render training data ineffective for Deep Neural Networks (DNNs). The primary objective is to ensure that DNNs trained on these modified examples perform no better than random guessing when evaluated on standard test datasets, while maintaining the visual quality of the data. For instance, an unlearnable selfie should remain visually appealing and suitable for use as a social profile picture, achieved by adding imperceptible noise that does not introduce noticeable defects.
 
@@ -406,5 +416,3 @@ The findings suggest that error-minimizing noise can significantly enhance data 
 [3] Huang, Hanxun, et al. "Unlearnable examples: Making personal data unexploitable." arXiv preprint arXiv:2101.04898 (2021).
 
 [4] Wenger, Emily, et al. “Sok: Anti-facial recognition technology.” 2023 IEEE Symposium on Security and Privacy (SP). IEEE, 2023.
-
-[5] Song, V. (2024, October 2). College students used Meta’s smart glasses to dox people in Real time. The Verge. https://www.theverge.com/2024/10/2/24260262/ray-ban-meta-smart-glasses-doxxing-privacy 
