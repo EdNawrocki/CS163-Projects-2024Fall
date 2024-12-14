@@ -32,7 +32,8 @@ However, as facial recognition technology becomes increasingly integrated into d
 ### FR Pipeline
 ![Patch Mapping for a Sample]({{'/assets/images/32/fr_pipeline.png' | relative_url}})
 {: style="width: 800px; max-width: 200%;"}
-*Fig. 1. Division of the facial recognition pipeline into 5 stages. Taken from [4]*
+*Fig. 1. Division of the facial recognition pipeline into 5 stages. Taken from [[4]](#references)*
+
 The operational workflow of FR systems can be divided into five critical stages:
 1. **Image Collection**: FR systems gather face images from various sources, including online scraping or capturing photos directly. This stage is foundational, as the quality and diversity of collected images significantly impact the system's effectiveness.
 2. **Image Preprocessing**: Preprocessing involves detecting and cropping faces from images, followed by normalizing the data to ensure uniformity. This step enhances the quality of the input data, making it suitable for accurate feature extraction.
@@ -52,8 +53,8 @@ Past attempts include wearables, like glasses or a hat with stickers, which aim 
 
 The Fawkes software targets the third stage of the FR pipeline, aiming to cloak facial images without dramatically altering their appearance. If these cloaked images are shared online and scraped for a facial recognition database, the poisoned image would provide the embedding for face verification. When a clean image is captured in the wild through surveillance technology, it would not find a match in the database as the poisoned embedding is effectively dissimilar to the unaltered facial embedding. The flow of this system is demonstrated in Figure 1. 
 
-![Image](../assets/images/32/Fawkes_System.png)
-*Fig 1. The Fawkes system aims to disrupt facial recognition by poisoning the training database. [[1]](#references)*
+![The Fawkes System]({{'/assets/images/32/Fawkes_System.png' | relative_url}})
+*Fig 2. The Fawkes system aims to disrupt facial recognition by poisoning the training database. [[1]](#references)*
 
 Some challenges to this technology are as follows:
 1. Image labels remain the same during the poisoning process, as they are posted to a known account, so the scope of the attack is limited to editing image contents
@@ -64,22 +65,23 @@ Some challenges to this technology are as follows:
 
 The generation of a cloak for a given image can be imagined as a constrained optimization problem, where C is the cloaking function, “Model” is the feature extractor used by the model, x is the original image, x_T is the target image and x ⊕ C(x,x_T) is the cloaked image.
 
-![Image](../assets/images/32/Fawkes_Contrained_Optimization.png)
+![Fawkes Constrained Optimization]({{'/assets/images/32/Fawkes_Contrained_Optimization.png' | relative_url}})
+{: style="width: 800px; max-width: 200%;"}
 
 Here, rho is the amount that we are allowing the image to be deviated by. When the real model used by facial recognition technology differs from the model used in cloaking optimization, Fawkes relies on the transferability effect, the property that models trained for similar tasks share similar properties, such as the facial vector embedding. 
 
 We can convert the optimization problem into this form:
 
-![Image](../assets/images/32/Fawkes_Loss_1.png)
+![Fawkes Loss]({{'/assets/images/32/Fawkes_Loss_1.png' | relative_url}})
 
 where taking lambda to infinity would make the image visually identical to the original image by heavily penalizing a cloaking distance larger than rho. This loss function uses the DSSIM (Structural Dis-Similarity Index) to determine if the cloak has overtaken rho in magnitude. Previous work has deemed DSSIM a useful metric at measuring user-perceived image distortion, an unexpected quality of feature vectors extracted by deep learning.
 
 ### Results
 
-Figure 2 shows a visualization of the effectiveness of cloaking when training on poisoned images. 
+Figure 3 shows a visualization of the effectiveness of cloaking when training on poisoned images. 
 
-![Image](../assets/images/32/Fawkes_Results.png)
-*Fig 2. Shown is a plot of embedding vectors after principal component analysis with the impact of cloaking demonstrated in (b). [[1]](#references)*
+![Fawkes Results]({{'/assets/images/32/Fawkes_Results.png' | relative_url}})
+*Fig 3. Shown is a plot of embedding vectors after principal component analysis with the impact of cloaking demonstrated in (b). [[1]](#references)*
 
 When training the cloak on a known feature extractor the Fawkes method achieved 100% accuracy when rho, the perturbation margin, is allowed to be greater than 0.005 which is barely detectable to the human eye. As demonstrated in the figure, the cloak is highly effective at changing the representation of the feature vector. However, it is not alway possible to know the feature extraction method of the target model. By using robust feature extractors, models that are trained adversarially to decrease sensitivity to input perturbations can be used as global feature extractors to train the cloaking to work against an unknown model. Using this method, Fawkes is able to achieve a protection success rate greater than 95%. When tested on Microsoft Azure Face API, Amazon Rekognition Face Verification, and Face++, the robust model is able to achieve 100% protection against all three. 
 
@@ -172,11 +174,11 @@ fawkes_bolei = files.upload()
 
 For reference, here is the original image:
 
-![image](../assets/images/32/prof_pic.jpg)
+![Prof Pic]({{'/assets/images/32/prof_pic.jpg' | relative_url}})
 
 And here is the cloaked image:
 
-![image](../assets/images/32/prof_pic_cloaked.png)
+![Prof Pic Cloaked]({{'/assets/images/32/prof_pic_cloaked.png' | relative_url}})
 
 I also download a different, uncloaked picture which I will use for face identification against the picture.
 
@@ -258,21 +260,21 @@ files.download("matches_model_3.csv")
 
 Each model was trying to find a match for the uncloaked picture of Bolei Zhou, where there was one correct match in the database.
 
-![image](../assets/images/32/Bolei_Zhou.png)
+![Bolei Zhou]({{'/assets/images/32/Bolei_Zhou.png' | relative_url}})
 
 The best model by far was VGG-Face. It's highest match to the uncloaked Bolei Zhou was the correct image, the cloaked version inserted into the database, with distance 0.44. 
 
 It's next highest match with a distance of 0.66 was an image of Michelle Wei.
 
-![image](../assets/images/32/Michelle_Wie.jpg)
+![Michelle Wie]({{'/assets/images/32/Michelle_Wie.jpg' | relative_url}})
 
 Facenet was completely fooled by the cloaking, and had the highest match an image of Shinzo Abe, with a distance of 0.25. It did not match the cloaked image of Bolei with the given image under the threshold.
 
-![image](../assets/images/32/Shinzo_Abe.jpg)
+![Shinzo Abe]({{'/assets/images/32/Shinzo_Abe.jpg' | relative_url}})
 
 OpenFace was also fooled by the cloaking, and gave an image of Steven Spielberg as being the closest to the given image, with a distance of 0.21. It also did not match the cloaked image of Bolei.
 
-![image](../assets/images/32/Steven_Spielberg.jpg)
+![Steven Spielberg]({{'/assets/images/32/Steven_Spielberg.jpg' | relative_url}})
 
 DeepFace was unable to find a match under the threshold.
 
@@ -316,13 +318,13 @@ Both α and β were hyperparameters that were each individually optimized for. T
 
 ![MTCNN-Attack Attack Pipeline]({{'/assets/images/32/pipeline.png' | relative_url}})
 {: style="width: 800px; max-width: 200%;"}
-*Fig. 3. The attack pipeline for MTCNN-Attack. A pair of patches is applied to N images and goes through data augmentation. The resulting images are fed through proposal networks to calculate classification loss, which is used alongside two other custom losses to update the patches through backpropagation. Taken from [[2]](#references)*
+*Fig. 4. The attack pipeline for MTCNN-Attack. A pair of patches is applied to N images and goes through data augmentation. The resulting images are fed through proposal networks to calculate classification loss, which is used alongside two other custom losses to update the patches through backpropagation. Taken from [[2]](#references)*
 
 Another concern was the applicability of this methodology in real-time scenarios. In realistic cases, factors like lighting or angling differences could decrease the effectiveness of the patches. To account for this, Kaziakhmedov et al. used multiple images with different head positions and lighting for each sample, and marked each of the patch boundaries for each image. This allowed them to implement Expectation-over-Transformation (EoT) and projective transformations, which increase model effectiveness by ensuring that the patches are mapped correctly.
 
 ![Patch Mapping for a Sample]({{'/assets/images/32/projmap.png' | relative_url}})
 {: style="width: 800px; max-width: 200%;"}
-*Fig. 4. An example of the sample input and the resultant patch mapping for the MTCNN-Attack model. Both EoT and projective mapping were used to ensure optimal patch placement. Taken from [[2]](#references)*
+*Fig. 5. An example of the sample input and the resultant patch mapping for the MTCNN-Attack model. Both EoT and projective mapping were used to ensure optimal patch placement. Taken from [[2]](#references)*
 
 ### Results
 
@@ -330,7 +332,7 @@ Tests were performed to evaluate the probability of misdetection for both the ba
 
 ![Test Results]({{'/assets/images/32/results.png' | relative_url}})
 {: style="width: 800px; max-width: 200%;"}
-*Fig. 5. The test results for both cheek and masked trials. Both tests show a strong misdetection performance for patched trials, especially when compared to unpatched trials. Taken from [[2]](#references)*
+*Fig. 6. The test results for both cheek and masked trials. Both tests show a strong misdetection performance for patched trials, especially when compared to unpatched trials. Taken from [[2]](#references)*
 
 There are several issues that are worth consideration, however. Firstly, the completely unpatched database used to match patched and unpatched samples with people only contained images of the people in the sames (a “targeted” attack); this means that further investigation must be performed to evaluate whether or not the learned patches perform as well for the general human population, or whether transferability is an issue that must be addressed in the future. Secondly, there is an element of impracticality associated with this project, as one must be wearing the black-and-white checkered marks to denote where the patches should be located. Generally, this may be deemed unsuitable for everyday use. But overall, the results show a considerable improvement with the learned patches as opposed to unpatched, suggesting that the model conceivably could be used to prevent facial identification in the future.
 
@@ -380,7 +382,7 @@ Although error-maximizing noise is more challenging to overcome than random nois
 
 ![Total Loss Function]({{'/assets/images/32/app3error_curves.png' | relative_url}})
 {: style="width: 800px; max-width: 100%;"}
-*Fig 6. The unlearnable effectiveness of different types of noise: random, adversarial and error-minimizing noise on CIFAR-10 dataset. The lower the clean test accuracy the more effective of the noise. Taken from [3]*
+*Fig 7. The unlearnable effectiveness of different types of noise: random, adversarial and error-minimizing noise on CIFAR-10 dataset. The lower the clean test accuracy the more effective of the noise. Taken from [3]*
 
 Class-wise noise introduces an explicit correlation with labels, causing the model to learn the noise instead of the actual content, which diminishes its ability to generalize to clean data. This type of noise also disrupts the independent and identically distributed (i.i.d.) assumption between training and test data, making it an effective data protection technique. However, class-wise noise can be partially bypassed through early stopping during training. 
 
@@ -397,7 +399,7 @@ This results in a training set where 10,525 identities remain clean, while 50 id
 
 ![Total Loss Function]({{'/assets/images/32/case_study_3.png' | relative_url}})
 {: style="width: 800px; max-width: 100%;"}
-*Fig 7. Preventing exploitation of face data using error-minimizing noise. Taken from [3]*
+*Fig 8. Preventing exploitation of face data using error-minimizing noise. Taken from [3]*
 
 ### Results
 The study concludes that error-minimizing noise is a viable tool for protecting personal face images from unauthorized use in training FR systems. In the partially unlearnable setting, the recognition accuracy for the 50 protected identities dropped to 16%, compared to 86% for the remaining clean identities. 
