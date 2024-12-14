@@ -216,11 +216,11 @@ fawkes_bolei = files.upload()
 
 For reference, here is the original image:
 
-![image](../assets/images/32/prof_pic.jpg)
+![Prof Pic]({{'/assets/images/32/prof_pic.jpg' | relative_url}})
 
 And here is the cloaked image:
 
-![image](../assets/images/32/prof_pic_cloaked.png)
+![Prof Pic Cloaked]({{'/assets/images/32/prof_pic_cloaked.png' | relative_url}})
 
 I also download a different, uncloaked picture which I will use for face identification against the picture.
 
@@ -302,21 +302,21 @@ files.download("matches_model_3.csv")
 
 Each model was trying to find a match for the uncloaked picture of Bolei Zhou, where there was one correct match in the database.
 
-![image](../assets/images/32/Bolei_Zhou.png)
+![Bolei Zhou]({{'/assets/images/32/Bolei_Zhou.png' | relative_url}})
 
 The best model by far was VGG-Face. It's highest match to the uncloaked Bolei Zhou was the correct image, the cloaked version inserted into the database, with distance 0.44. 
 
 It's next highest match with a distance of 0.66 was an image of Michelle Wei.
 
-![image](../assets/images/32/Michelle_Wie.jpg)
+![Michelle Wie]({{'/assets/images/32/Michelle_Wie.jpg' | relative_url}})
 
 Facenet was completely fooled by the cloaking, and had the highest match an image of Shinzo Abe, with a distance of 0.25. It did not match the cloaked image of Bolei with the given image under the threshold.
 
-![image](../assets/images/32/Shinzo_Abe.jpg)
+![Shinzo Abe]({{'/assets/images/32/Shinzo_Abe.jpg' | relative_url}})
 
 OpenFace was also fooled by the cloaking, and gave an image of Steven Spielberg as being the closest to the given image, with a distance of 0.21. It also did not match the cloaked image of Bolei.
 
-![image](../assets/images/32/Steven_Spielberg.jpg)
+![Steven Spielberg]({{'/assets/images/32/Steven_Spielberg.jpg' | relative_url}})
 
 DeepFace was unable to find a match under the threshold.
 
