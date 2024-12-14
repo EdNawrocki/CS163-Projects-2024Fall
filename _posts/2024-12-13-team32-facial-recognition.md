@@ -6,7 +6,7 @@ author: Edward Nawrocki, Donovan Rimer, Tyler Cho
 date: 2024-12-13
 ---
 
-> In this article, we will examine various anti-facial recognition techniques and discuss their effectiveness. First, we will introduce facial recognition...
+> In this article, we examine various anti-facial recognition techniques and assess their effectiveness. We begin by introducing facial recognition and providing a high-level overview of its pipeline. Next, we explore how Fawkes software exploits vulnerabilities in image cloaking by testing it on the PubFig database. We then discuss MTCNN-Attack, which prevents models from recognizing facial features by overlaying grayscale patches on individuals' faces. Finally, we present a method that adds noise to images, rendering them unlearnable to models while remaining visually indistinguishable to the naked eye.
 
 <!--more-->
 {: class="table-of-content"}
@@ -25,11 +25,22 @@ date: 2024-12-13
 
 # Introduction
 
-Emerging as one of the most prominent applications of computer vision, facial recognition is a technology that identifies faces from an image input to match with a known identity. There are various algorithms that it can be used in, such as one-to-one matching, which compares an individual’s face to their claimed identity, and one-to-many, which would query this face with many others in a database to determine their identity out of a pool. Because of its versatility, facial recognition has been incorporated into many different aspects of our lives, from creating specialized albums of various contacts to security screening used by airport TSA. 
+Facial Recognition (FR) systems are designed to identify individuals by analyzing and comparing their facial characteristics. Unlike facial verification systems, which primarily authenticate users on devices (such as Apple's FaceID by matching a user’s face to a single stored feature vector), FR systems focus on recognizing individuals from a larger pool of known identities.
 
-The earliest facial detection models were cascade-based; one prototypical model, developed by Paul Viola and Michael Jones in 2001, discarded image backgrounds to quickly identify critical facial features. Neural network-based models grew in popularity in the 2010s as our understanding of the system developed. Today, many models make use of high-performing vision transformers to encode key features and their positional information as tokens, passing these tokens through transformer layers and obtaining classification tokens to make their judgments.
+However, as facial recognition technology becomes increasingly integrated into daily life, privacy and security concerns have emerged. This has led to the development of anti-facial recognition (AFR) tools that strategically target vulnerabilities in the FR pipeline to prevent accurate identification of individuals.
 
-However, as facial recognition technology has become more and more integrated into daily life, questions over privacy and security concerns have arisen. For example, Verge tech reporter Victoria Song reported this past October that Harvard students were able to take advantage of the Instagram live feature with Meta’s smart glasses to identify people in real-time. These growing concerns over privacy have prompted an increase in adversarial models to interfere with recognition technologies, three examples of which will be examined in further detail below.
+### FR Pipeline
+![Patch Mapping for a Sample]({{'/assets/images/32/fr_pipeline.png' | relative_url}})
+{: style="width: 800px; max-width: 200%;"}
+*Fig. 1. Division of the facial recognition pipeline into 5 stages. Taken from [4]*
+The operational workflow of FR systems can be divided into five critical stages:
+1. **Image Collection**: FR systems gather face images from various sources, including online scraping or capturing photos directly. This stage is foundational, as the quality and diversity of collected images significantly impact the system's effectiveness.
+2. **Image Preprocessing**: Preprocessing involves detecting and cropping faces from images, followed by normalizing the data to ensure uniformity. This step enhances the quality of the input data, making it suitable for accurate feature extraction.
+3. **Training Feature Extractor**: Typically a deep neural network (DNN) trained to convert face images into mathematical feature vectors. These vectors are designed to be similar for images of the same person and distinct for different individuals. Training requires vast amounts of labeled data and computational resources.
+4. **Reference Database Creation**: Creating a reference database involves storing feature vectors alongside corresponding identities, enabling the system to compare and identify faces accurately. The database must be extensive and well-organized to facilitate quick and reliable matching during the recognition process.
+5. **Query Matching**: In real-time operation, the FR system processes an unidentified face image by extracting its feature vector and comparing it against the reference database. Using distance metrics like L2 or cosine similarity, the system identifies the closest match and retrieves the associated identity if the similarity
+
+AFR tools strategically target one or more of the five stages in the FR pipeline to prevent accurate identification of individuals, such as Fawkes acting on the fourth stage and Unlearnable Examples on the third.
 
 # [Fawkes](https://arxiv.org/abs/2002.08327 "Original Fawkes Paper")
 
@@ -405,5 +416,3 @@ The findings suggest that error-minimizing noise can significantly enhance data 
 [3] Huang, Hanxun, et al. "Unlearnable examples: Making personal data unexploitable." arXiv preprint arXiv:2101.04898 (2021).
 
 [4] Wenger, Emily, et al. “Sok: Anti-facial recognition technology.” 2023 IEEE Symposium on Security and Privacy (SP). IEEE, 2023.
-
-[5] Song, V. (2024, October 2). College students used Meta’s smart glasses to dox people in Real time. The Verge. https://www.theverge.com/2024/10/2/24260262/ray-ban-meta-smart-glasses-doxxing-privacy 
