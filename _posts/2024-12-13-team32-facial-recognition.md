@@ -41,7 +41,7 @@ Past attempts include wearables, like glasses or a hat with stickers, which aim 
 
 The Fawkes software targets the third stage of the FR pipeline, aiming to cloak facial images without dramatically altering their appearance. If these cloaked images are shared online and scraped for a facial recognition database, the poisoned image would provide the embedding for face verification. When a clean image is captured in the wild through surveillance technology, it would not find a match in the database as the poisoned embedding is effectively dissimilar to the unaltered facial embedding. The flow of this system is demonstrated in Figure 1. 
 
-![The Fawkes System]({{'/assets/images/32/Fawkes_System.png' | relative_url}})
+![Image](../assets/images/32/Fawkes_System.png)
 *Fig 1. The Fawkes system aims to disrupt facial recognition by poisoning the training database. [[1]](#references)*
 
 Some challenges to this technology are as follows:
@@ -53,13 +53,13 @@ Some challenges to this technology are as follows:
 
 The generation of a cloak for a given image can be imagined as a constrained optimization problem, where C is the cloaking function, “Model” is the feature extractor used by the model, x is the original image, x_T is the target image and x ⊕ C(x,x_T) is the cloaked image.
 
-![Fawkes Constrained Optimization]({{'/assets/images/32/Fawkes_Contrained_Optimization.png' | relative_url}})
+![Image](../assets/images/32/Fawkes_Contrained_Optimization.png)
 
 Here, rho is the amount that we are allowing the image to be deviated by. When the real model used by facial recognition technology differs from the model used in cloaking optimization, Fawkes relies on the transferability effect, the property that models trained for similar tasks share similar properties, such as the facial vector embedding. 
 
 We can convert the optimization problem into this form:
 
-![Fawkes Loss]({{'/assets/images/32/Fawkes_Loss_1.png' | relative_url}})
+![Image](../assets/images/32/Fawkes_Loss_1.png)
 
 where taking lambda to infinity would make the image visually identical to the original image by heavily penalizing a cloaking distance larger than rho. This loss function uses the DSSIM (Structural Dis-Similarity Index) to determine if the cloak has overtaken rho in magnitude. Previous work has deemed DSSIM a useful metric at measuring user-perceived image distortion, an unexpected quality of feature vectors extracted by deep learning.
 
@@ -67,8 +67,7 @@ where taking lambda to infinity would make the image visually identical to the o
 
 Figure 2 shows a visualization of the effectiveness of cloaking when training on poisoned images. 
 
-![Fawkes Results]({{'/assets/images/32/Fawkes_Results.png' | relative_url}})
-
+![Image](../assets/images/32/Fawkes_Results.png)
 *Fig 2. Shown is a plot of embedding vectors after principal component analysis with the impact of cloaking demonstrated in (b). [[1]](#references)*
 
 When training the cloak on a known feature extractor the Fawkes method achieved 100% accuracy when rho, the perturbation margin, is allowed to be greater than 0.005 which is barely detectable to the human eye. As demonstrated in the figure, the cloak is highly effective at changing the representation of the feature vector. However, it is not alway possible to know the feature extraction method of the target model. By using robust feature extractors, models that are trained adversarially to decrease sensitivity to input perturbations can be used as global feature extractors to train the cloaking to work against an unknown model. Using this method, Fawkes is able to achieve a protection success rate greater than 95%. When tested on Microsoft Azure Face API, Amazon Rekognition Face Verification, and Face++, the robust model is able to achieve 100% protection against all three. 
@@ -162,11 +161,11 @@ fawkes_bolei = files.upload()
 
 For reference, here is the original image:
 
-![Prof Pic]({{'/assets/images/32/prof_pic.jpg' | relative_url}})
+![image](../assets/images/32/prof_pic.jpg)
 
 And here is the cloaked image:
 
-![Prof Pic Cloaked]({{'/assets/images/32/prof_pic_cloaked.png' | relative_url}})
+![image](../assets/images/32/prof_pic_cloaked.png)
 
 I also download a different, uncloaked picture which I will use for face identification against the picture.
 
@@ -248,21 +247,21 @@ files.download("matches_model_3.csv")
 
 Each model was trying to find a match for the uncloaked picture of Bolei Zhou, where there was one correct match in the database.
 
-![Bolei Zhou]({{'/assets/images/32/Bolei_Zhou.png' | relative_url}})
+![image](../assets/images/32/Bolei_Zhou.png)
 
 The best model by far was VGG-Face. It's highest match to the uncloaked Bolei Zhou was the correct image, the cloaked version inserted into the database, with distance 0.44. 
 
 It's next highest match with a distance of 0.66 was an image of Michelle Wei.
 
-![Michelle Wie]({{'/assets/images/32/Michelle_Wie.jpg' | relative_url}})
+![image](../assets/images/32/Michelle_Wie.jpg)
 
 Facenet was completely fooled by the cloaking, and had the highest match an image of Shinzo Abe, with a distance of 0.25. It did not match the cloaked image of Bolei with the given image under the threshold.
 
-![Shinzo Abe]({{'/assets/images/32/Shinzo_Abe.jpg' | relative_url}})
+![image](../assets/images/32/Shinzo_Abe.jpg)
 
 OpenFace was also fooled by the cloaking, and gave an image of Steven Spielberg as being the closest to the given image, with a distance of 0.21. It also did not match the cloaked image of Bolei.
 
-![Steven Spielberg]({{'/assets/images/32/Steven_Spielberg.jpg' | relative_url}})
+![image](../assets/images/32/Steven_Spielberg.jpg)
 
 DeepFace was unable to find a match under the threshold.
 
