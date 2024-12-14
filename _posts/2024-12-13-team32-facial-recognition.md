@@ -29,6 +29,18 @@ Facial Recognition (FR) systems are designed to identify individuals by analyzin
 
 However, as facial recognition technology becomes increasingly integrated into daily life, privacy and security concerns have emerged. This has led to the development of anti-facial recognition (AFR) tools that strategically target vulnerabilities in the FR pipeline to prevent accurate identification of individuals.
 
+## FR Pipeline
+![Patch Mapping for a Sample]({{'/assets/images/32/fr_pipeline.png' | relative_url}})
+{: style="width: 800px; max-width: 200%;"}
+*Fig. 1. Division of the facial recognition pipeline into 5 stages. Taken from [4]*
+The operational workflow of FR systems can be divided into five critical stages:
+1. **Image Collection**: FR systems gather face images from various sources, including online scraping or capturing photos directly. This stage is foundational, as the quality and diversity of collected images significantly impact the system's effectiveness.
+2. **Image Preprocessing**: Preprocessing involves detecting and cropping faces from images, followed by normalizing the data to ensure uniformity. This step enhances the quality of the input data, making it suitable for accurate feature extraction.
+3. **Training Feature Extractor**: Typically a deep neural network (DNN) trained to convert face images into mathematical feature vectors. These vectors are designed to be similar for images of the same person and distinct for different individuals. Training requires vast amounts of labeled data and computational resources.
+4. **Reference Database Creation**: Creating a reference database involves storing feature vectors alongside corresponding identities, enabling the system to compare and identify faces accurately. The database must be extensive and well-organized to facilitate quick and reliable matching during the recognition process.
+5. **Query Matching**: In real-time operation, the FR system processes an unidentified face image by extracting its feature vector and comparing it against the reference database. Using distance metrics like L2 or cosine similarity, the system identifies the closest match and retrieves the associated identity if the similarity
+AFR tools strategically target one or more of the five stages in the FR pipeline to prevent accurate identification of individuals, such as Fawkes acting on the fourth stage and Unlearnable Examples on the third.
+
 ### FR Pipeline
 ![Patch Mapping for a Sample]({{'/assets/images/32/fr_pipeline.png' | relative_url}})
 {: style="width: 800px; max-width: 200%;"}
@@ -382,7 +394,7 @@ Although error-maximizing noise is more challenging to overcome than random nois
 
 ![Total Loss Function]({{'/assets/images/32/app3error_curves.png' | relative_url}})
 {: style="width: 800px; max-width: 100%;"}
-*Fig 7. The unlearnable effectiveness of different types of noise: random, adversarial and error-minimizing noise on CIFAR-10 dataset. The lower the clean test accuracy the more effective of the noise. Taken from [3]*
+*Fig 7. The unlearnable effectiveness of different types of noise: random, adversarial and error-minimizing noise on CIFAR-10 dataset. The lower the clean test accuracy the more effective of the noise. Taken from [[3]](#references)*
 
 Class-wise noise introduces an explicit correlation with labels, causing the model to learn the noise instead of the actual content, which diminishes its ability to generalize to clean data. This type of noise also disrupts the independent and identically distributed (i.i.d.) assumption between training and test data, making it an effective data protection technique. However, class-wise noise can be partially bypassed through early stopping during training. 
 
@@ -399,7 +411,7 @@ This results in a training set where 10,525 identities remain clean, while 50 id
 
 ![Total Loss Function]({{'/assets/images/32/case_study_3.png' | relative_url}})
 {: style="width: 800px; max-width: 100%;"}
-*Fig 8. Preventing exploitation of face data using error-minimizing noise. Taken from [3]*
+*Fig 8. Preventing exploitation of face data using error-minimizing noise. Taken from [[3]](#references)*
 
 ### Results
 The study concludes that error-minimizing noise is a viable tool for protecting personal face images from unauthorized use in training FR systems. In the partially unlearnable setting, the recognition accuracy for the 50 protected identities dropped to 16%, compared to 86% for the remaining clean identities. 
