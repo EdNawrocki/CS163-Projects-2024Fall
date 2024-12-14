@@ -6,9 +6,7 @@ author: Edward Nawrocki, Donovan Rimer, Tyler Cho
 date: 2024-12-13
 ---
 
-
-> In this article, we will examine various anti-facial recognition techniques and discuss their effectiveness. First, we will introduce facial recognition 
-
+> In this article, we will examine various anti-facial recognition techniques and discuss their effectiveness. First, we will introduce facial recognition...
 
 <!--more-->
 {: class="table-of-content"}
@@ -25,10 +23,14 @@ date: 2024-12-13
 
 ---
 
-## Introduction
-Facial Recognition (FR) systems are designed to identify individuals by analyzing and comparing their facial characteristics. Unlike facial verification systems, which primarily authenticate users on devices (such as Apple's FaceID by matching a user’s face to a single stored feature vector), FR systems focus on recognizing individuals from a larger pool of known identities.
+# Introduction
 
-However, as facial recognition technology becomes increasingly integrated into daily life, privacy and security concerns have emerged. This has led to the development of anti-facial recognition (AFR) tools that strategically target vulnerabilities in the FR pipeline to prevent accurate identification of individuals.
+Emerging as one of the most prominent applications of computer vision, facial recognition is a technology that identifies faces from an image input to match with a known identity. There are various algorithms that it can be used in, such as one-to-one matching, which compares an individual’s face to their claimed identity, and one-to-many, which would query this face with many others in a database to determine their identity out of a pool. Because of its versatility, facial recognition has been incorporated into many different aspects of our lives, from creating specialized albums of various contacts to security screening used by airport TSA. 
+
+The earliest facial detection models were cascade-based; one prototypical model, developed by Paul Viola and Michael Jones in 2001, discarded image backgrounds to quickly identify critical facial features. Neural network-based models grew in popularity in the 2010s as our understanding of the system developed. Today, many models make use of high-performing vision transformers to encode key features and their positional information as tokens, passing these tokens through transformer layers and obtaining classification tokens to make their judgments.
+
+However, as facial recognition technology has become more and more integrated into daily life, questions over privacy and security concerns have arisen. For example, Verge tech reporter Victoria Song reported this past October that Harvard students were able to take advantage of the Instagram live feature with Meta’s smart glasses to identify people in real-time. These growing concerns over privacy have prompted an increase in adversarial models to interfere with recognition technologies, three examples of which will be examined in further detail below.
+
 
 # [Fawkes](https://arxiv.org/abs/2002.08327 "Original Fawkes Paper")
 
@@ -399,4 +401,10 @@ The findings suggest that error-minimizing noise can significantly enhance data 
 
 [1] Shan, Wenger, Zhang, Li, Zheng, Zhao. "Fawkes: Protecting Privacy against Unauthorized Deep Learning Models". arXiv [cs.CV] 2020.
 
+[2] Kaziakhmedov, Edgar, et al. “Real-world adversarial attack on MTCNN face detection system”. arXiv:1910.06261 [cs.CV]
+
 [3] Huang, Hanxun, et al. "Unlearnable examples: Making personal data unexploitable." arXiv preprint arXiv:2101.04898 (2021).
+
+[4] Wenger, Emily, et al. “Sok: Anti-facial recognition technology.” 2023 IEEE Symposium on Security and Privacy (SP). IEEE, 2023.
+
+[5] Song, V. (2024, October 2). College students used Meta’s smart glasses to dox people in Real time. The Verge. https://www.theverge.com/2024/10/2/24260262/ray-ban-meta-smart-glasses-doxxing-privacy 
