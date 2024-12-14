@@ -32,9 +32,9 @@ The earliest facial detection models were cascade-based; one prototypical model,
 However, as facial recognition technology has become more and more integrated into daily life, questions over privacy and security concerns have arisen. For example, Verge tech reporter Victoria Song reported this past October that Harvard students were able to take advantage of the Instagram live feature with Meta’s smart glasses to identify people in real-time. These growing concerns over privacy have prompted an increase in adversarial models to interfere with recognition technologies, three examples of which will be examined in further detail below.
 
 
-# [Fawkes](https://arxiv.org/abs/2002.08327 "Original Fawkes Paper")
+## [Fawkes](https://arxiv.org/abs/2002.08327 "Original Fawkes Paper")
 
-## Motivation
+### Motivation
 
 Facial Recognition poses a serious threat to personal privacy in the modern era of surveillance. Privately owned companies like Clearview.ai scrape billions of images from social media to create a model capable of recognizing millions of citizens without their consent. In general, anti facial recognition technology takes the approach of what is known as a poisoning attack in machine learning, making someone’s face difficult to recognize. 
 
@@ -50,7 +50,7 @@ Some challenges to this technology are as follows:
 2. The cloak should be imperceptible, meaning the use of the image for human eyes is not negatively impacted.
 3. The cloak should work regardless of facial detection model architecture.
 
-## Optimizing Cloak Perturbations
+### Optimizing Cloak Perturbations
 
 The generation of a cloak for a given image can be imagined as a constrained optimization problem, where C is the cloaking function, “Model” is the feature extractor used by the model, x is the original image, x_T is the target image and x ⊕ C(x,x_T) is the cloaked image.
 
@@ -64,7 +64,7 @@ We can convert the optimization problem into this form:
 
 where taking lambda to infinity would make the image visually identical to the original image by heavily penalizing a cloaking distance larger than rho. This loss function uses the DSSIM (Structural Dis-Similarity Index) to determine if the cloak has overtaken rho in magnitude. Previous work has deemed DSSIM a useful metric at measuring user-perceived image distortion, an unexpected quality of feature vectors extracted by deep learning.
 
-## Results
+### Results
 
 Figure 2 shows a visualization of the effectiveness of cloaking when training on poisoned images. 
 
